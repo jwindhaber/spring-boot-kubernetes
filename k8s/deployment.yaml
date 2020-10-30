@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: spring-boot-simple-web
+  name: spring-boot-simple-web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: spring-boot-simple-web
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: spring-boot-simple-web
+    spec:
+      containers:
+      - image: docker.io/library/simple-web:0.0.1-SNAPSHOT
+        name: simple-web
+        resources: {}
+        readinessProbe:
+          httpGet:
+            port: 8080
+            path: http://localhost:8080/actuator/health/readiness
+        livenessProbe:
+          httpGet:
+            port: 8080
+            path: http://localhost:8080/actuator/health/liveness
+status: {}

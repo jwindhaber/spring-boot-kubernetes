@@ -1,9 +1,23 @@
-**Creating a dashboard:**
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
+
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml -OutFile kubernetes-dashboard.yaml
+
 kubectl proxy
+
+
+**Creating the deployment of the postgres database:**
+kubectl apply -f deployment-postgres.yaml
+kubectl apply -f service-postgres-cluster-ip.yaml
+kubectl port-forward service/postgres-simple 5432:5432
 
 **Creating the deployment of the application:**
 kubectl create deployment spring-boot-simple-web --image docker.io/library/simple-web:0.0.1-SNAPSHOT -o yaml --dry-run > deployment.yaml
+
+
+
+kubectl delete -n default deployment spring-boot-simple-web-postgres
+delete -n default service spring-boot-simple-web-postgres
+
 
 **Creating a service:**
 
@@ -14,4 +28,8 @@ kubectl create service loadbalancer spring-boot-simple-web --tcp 80:8080 -o yaml
 
 **Changing the deployment or service:**
 kubectl apply -f deployment.yaml
+
+
+
+
 

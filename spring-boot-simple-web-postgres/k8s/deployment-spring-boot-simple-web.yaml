@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: spring-boot-simple-web
+  name: spring-boot-simple-web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: spring-boot-simple-web
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: spring-boot-simple-web
+    spec:
+      containers:
+      - image: docker.io/library/spring-boot-simple-web-postgres:0.0.1-SNAPSHOT
+        name: simple-web
+        env:
+          - name: SPRING_DATASOURCE_URL
+            value: jdbc:postgresql://10.101.186.196:5432/et1
+          - name: SPRING_DATASOURCE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: username
+          - name: SPRING_DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: password
+        resources: {}
+        readinessProbe:
+          httpGet:
+            port: 8080
+            path: http://localhost:8080/actuator/health/readiness
+        livenessProbe:
+          httpGet:
+            port: 8080
+            path: http://localhost:8080/actuator/health/liveness
+status: {}

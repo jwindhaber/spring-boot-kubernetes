@@ -1,0 +1,17 @@
+bootJar {
+	mainClassName = "easytax.kubernetes.example.simplewebpostgres.SimpleWebApplicationPostgres"
+}
+
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+//	implementation 'de.codecentric:spring-boot-admin-starter-server'
+//	implementation 'de.codecentric:spring-boot-admin-starter-client'
+	runtimeOnly 'org.postgresql:postgresql'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+}
+

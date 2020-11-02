@@ -1,4 +1,4 @@
-package easytax.docker.example.simpleweb;
+package easytax.kubernetes.example.simpleweb;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

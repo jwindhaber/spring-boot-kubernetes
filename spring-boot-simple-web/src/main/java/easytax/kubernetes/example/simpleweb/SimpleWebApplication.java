@@ -1,4 +1,4 @@
-package easytax.docker.example.simpleweb;
+package easytax.kubernetes.example.simpleweb;
 
 import de.codecentric.boot.admin.server.config.EnableAdminServer;
 import org.springframework.boot.SpringApplication;

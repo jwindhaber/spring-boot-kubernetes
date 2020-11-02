@@ -1,3 +1,4 @@
 rootProject.name = 'simple-web'
 
 include 'spring-boot-simple-web'
+include 'spring-boot-simple-web-postgres'

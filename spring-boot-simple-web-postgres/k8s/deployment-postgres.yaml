@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: postgres-simple
+  name: postgres-simple
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-simple
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: postgres-simple
+    spec:
+      containers:
+      - image: easytax-docker-artifactory-partner.infonova.com/easytax/framework/easytax-db-postgres:18.0.0-SNAPSHOT
+        name: postgres-simple
+        resources: {}
+status: {}

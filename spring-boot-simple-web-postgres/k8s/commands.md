@@ -15,7 +15,8 @@ kubectl create deployment spring-boot-simple-web --image docker.io/library/simpl
 
 
 
-kubectl delete -n default deployment spring-boot-simple-web-postgres
+kubectl delete -n default deployment easytax-platform
+
 delete -n default service spring-boot-simple-web-postgres
 
 
@@ -28,6 +29,12 @@ kubectl create service loadbalancer spring-boot-simple-web --tcp 80:8080 -o yaml
 
 **Changing the deployment or service:**
 kubectl apply -f deployment.yaml
+
+
+**Logging**
+
+kubectl logs easytax-platform-6c5867d8cf-rfgg7
+kubectl logs -l app=easytax-platform
 
 
 

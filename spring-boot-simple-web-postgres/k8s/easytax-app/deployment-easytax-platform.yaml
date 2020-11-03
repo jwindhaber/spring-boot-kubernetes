@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: easytax-platform
+  name: easytax-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: easytax-platform
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: easytax-platform
+    spec:
+      containers:
+      - image: easytaxacr.azurecr.io/easytax-all-web-boot:18.0.0-SNAPSHOT
+        name: easytax-platform
+        env:
+          - name: SPRING_DATASOURCE_URL
+            value: "jdbc:postgresql://10.0.25.44:5432/et1"
+          - name: SPRING_DATASOURCE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: username
+          - name: SPRING_DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: password
+          - name: spring.activemq.in-memory
+            value: "true"
+          - name: easytax.oltp.activemq.embedded
+            value: "true"
+          - name: JAVA_OPTS
+            value: "-Duser.timezone=Europe/Zurich"
+        resources:
+          requests:
+            memory: 428Mi
+          limits:
+            memory: 3500Mi
+        readinessProbe:
+          httpGet:
+            port: 8080
+            path: /easytax/actuator/health/readiness
+          failureThreshold: 1
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            port: 8080
+            path: /easytax/actuator/health/liveness
+          failureThreshold: 1
+          periodSeconds: 10
+        startupProbe:
+          httpGet:
+            port: 8080
+            path: /easytax/actuator/health/liveness
+          failureThreshold: 30
+          periodSeconds: 10
+status: {}

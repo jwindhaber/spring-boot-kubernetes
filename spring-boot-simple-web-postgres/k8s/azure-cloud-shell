@@ -1,0 +1,24 @@
+
+az aks browse --resource-group easytax_group --name easytax-k8s --listen-port=8002
+
+
+az aks get-credentials -a --resource-group easytax_group --name easytax-k8s
+
+
+az acr create --resource-group easytax_group --name easytaxacr --sku Basic
+
+docker login easytaxacr.azurecr.io
+
+kubectl config view -o jsonpath='{.users[?(@.name == "clusterUser_easytax_group_easytax-k8s")].user.auth-provider.config.access-token}'
+
+
+docker tag 36f1ed89401d easytaxacr.azurecr.io/easytax-db-postgres:18.0.0-SNAPSHOT
+docker push easytaxacr.azurecr.io/easytax-db-postgres:18.0.0-SNAPSHOT
+
+
+
+docker tag easytax-all-web-boot:18.0.0-SNAPSHOT easytaxacr.azurecr.io/easytax-all-web-boot:18.0.0-SNAPSHOT
+docker push easytaxacr.azurecr.io/easytax-all-web-boot:18.0.0-SNAPSHOT
+
+
+az aks update -n easytax-k8s -g easytax_group --attach-acr easytaxacr

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: simple-web-postgres-cluster-ip
+  name: simple-web-postgres-cluster-ip
+spec:
+  selector:
+    app: simple-web-postgres
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080

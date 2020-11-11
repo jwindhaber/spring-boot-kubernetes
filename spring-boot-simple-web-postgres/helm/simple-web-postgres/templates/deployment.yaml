@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "simple-web-postgres.fullname" . }}
+  labels:
+    {{- include "simple-web-postgres.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "simple-web-postgres.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "simple-web-postgres.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "simple-web-postgres.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name:  {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- if .Values.postgresql.enabled }}
+            - name: SPRING_DATASOURCE_URL
+              ## url must be "jdbc:postgresql://simple-web-postgres-postgresql:5432/sample"
+              value: "jdbc:postgresql://{{ template "simple-web-postgres.postgresql.fullname" . }}:{{ .Values.postgresql.service.port}}/{{ .Values.postgresql.postgresqlDatabase}}"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: {{ .Values.postgresql.postgresqlUsername | quote }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "simple-web-postgres.postgresql.fullname" . }}
+                  key: postgresql-password
+            - name: CONCOURSE_POSTGRES_DATABASE
+              value: {{ .Values.postgresql.postgresqlDatabase | quote }}
+            {{- else }}
+            - name: SPRING_DATASOURCE_URL
+              value: "{{ .Values.env.springDatasourceUrl }}"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "{{ .Values.env.springDatasourceUrl | default .}}"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: sample
+            - name: spring.activemq.in-memory
+              value: "true"
+            - name: easytax.oltp.activemq.embedded
+              value: "true"
+            - name: JAVA_OPTS
+              value: "-Duser.timezone=Europe/Zurich"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /actuator/health/readiness
+            initialDelaySeconds: 10
+            failureThreshold: 1
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /actuator/health/liveness
+            initialDelaySeconds: 10
+            failureThreshold: 1
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+# Startup Probe seems not to be supported by
+#        startupProbe:
+#          httpGet:
+#            port: 8080
+#            path: /easytax/actuator/health/liveness
+#          failureThreshold: 30
+#          periodSeconds: 10
+status: {}

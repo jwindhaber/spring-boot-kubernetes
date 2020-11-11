@@ -1,14 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  creationTimestamp: null
   labels:
-    app: simple-web-postgres-cluster-ip
-  name: simple-web-postgres-cluster-ip
+    app: {{ include "simple-web-postgres.fullname" . }}
+  name: {{ include "simple-web-postgres.fullname" . }}
 spec:
   selector:
-    app: simple-web-postgres
+    app: {{ include "simple-web-postgres.fullname" . }}
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 8080
+    targetPort: {{ .Values.web.port }}

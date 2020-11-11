@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: simple-web-postgres-ingress
+  name: {{ include "simple-web-postgres.fullname" . }}
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -12,5 +12,5 @@ spec:
         paths:
         -  path: /
            backend:
-              serviceName: simple-web-postgres-cluster-ip
+              serviceName: {{ include "simple-web-postgres.fullname" . }}
               servicePort: 80

@@ -36,7 +36,6 @@ spec:
           env:
             {{- if .Values.postgresql.enabled }}
             - name: SPRING_DATASOURCE_URL
-              ## url must be "jdbc:postgresql://simple-web-postgres-postgresql:5432/sample"
               value: "jdbc:postgresql://{{ template "simple-web-postgres.postgresql.fullname" . }}:{{ .Values.postgresql.service.port}}/{{ .Values.postgresql.postgresqlDatabase}}"
             - name: SPRING_DATASOURCE_USERNAME
               value: {{ .Values.postgresql.postgresqlUsername | quote }}
@@ -45,24 +44,33 @@ spec:
                 secretKeyRef:
                   name: {{ template "simple-web-postgres.postgresql.fullname" . }}
                   key: postgresql-password
-            - name: CONCOURSE_POSTGRES_DATABASE
-              value: {{ .Values.postgresql.postgresqlDatabase | quote }}
             {{- else }}
+            {{- if .Values.web.datasource.url}}
             - name: SPRING_DATASOURCE_URL
-              value: "{{ .Values.env.springDatasourceUrl }}"
+              value: {{ .Values.web.datasource.url | quote }}
+            {{- end }}
             - name: SPRING_DATASOURCE_USERNAME
-              value: "{{ .Values.env.springDatasourceUrl | default .}}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "simple-web-postgres.fullname" . }}
+                  key: postgresql-user
             - name: SPRING_DATASOURCE_PASSWORD
-              value: sample
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "simple-web-postgres.fullname" . }}
+                  key: postgresql-password
+            {{- end }}
+            {{- if .Values.web.env.spring.activeMqInMemory}}
             - name: spring.activemq.in-memory
-              value: "true"
+              value: {{ .Values.web.env.spring.activeMqInMemory | quote }}
+              {{- end}}
+            {{- if .Values.web.env.spring.activeMqEmbedded}}
             - name: easytax.oltp.activemq.embedded
-              value: "true"
-            - name: JAVA_OPTS
-              value: "-Duser.timezone=Europe/Zurich"
+              value: {{ .Values.web.env.spring.activeMqEmbedded | quote }}
+              {{- end}}
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: {{ .Values.web.port }}
               protocol: TCP
           readinessProbe:
             httpGet:

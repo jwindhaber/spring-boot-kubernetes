@@ -10,26 +10,20 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
-env:
-  springDatasourceUrl: "jdbc:postgresql://simple-web-postgres-postgresql:5432/sample"
-  springDatasourceUsername: ""
-  springDatasourcePassword: ""
-
-
-#  env:
-#    - name: SPRING_DATASOURCE_URL
-#      value:
-#    - name: SPRING_DATASOURCE_USERNAME
-#      value: sample
-#    - name: SPRING_DATASOURCE_PASSWORD
-#      value: sample
-#    - name: spring.activemq.in-memory
-#      value: "true"
-#    - name: easytax.oltp.activemq.embedded
-#      value: "true"
-#    - name: JAVA_OPTS
-#      value: "-Duser.timezone=Europe/Zurich"
-
+web:
+  port: 8080
+  datasource:
+    url:
+    username:
+    ##SHOULD COME FROM A SECRET
+    password:
+  env:
+    java:
+      timezone: "-Duser.timezone=Europe/Zurich"
+      javaOpts:
+    spring:
+      activeMqInMemory: true
+      activeMqEmbedded: true
 
 imagePullSecrets: []
 nameOverride: ""

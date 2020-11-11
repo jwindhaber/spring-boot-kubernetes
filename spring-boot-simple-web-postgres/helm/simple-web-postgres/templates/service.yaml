@@ -1,13 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: {{ include "simple-web-postgres.fullname" . }}
   name: {{ include "simple-web-postgres.fullname" . }}
+  labels:
+    {{- include "simple-web-postgres.labels" . | nindent 4 }}
 spec:
-  selector:
-    app: {{ include "simple-web-postgres.fullname" . }}
+  type: {{ .Values.service.type }}
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: {{ .Values.web.port }}
+    - port: {{ .Values.service.port }}
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "simple-web-postgres.selectorLabels" . | nindent 4 }}

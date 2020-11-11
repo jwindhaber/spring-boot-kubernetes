@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-postgres-init-scripts
+data:
+{{ (.Files.Glob "postgres-init-scripts/*").AsConfig | indent 2 }}
+##  setup.sql: |
+##    CREATE TABLE instr_event_priority (instr_event_priority_id VARCHAR(140), revision_id NUMERIC(19), CONSTRAINT pk_instr_event_priority PRIMARY KEY (instr_event_priority_id));

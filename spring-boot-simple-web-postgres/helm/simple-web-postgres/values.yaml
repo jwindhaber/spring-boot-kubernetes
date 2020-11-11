@@ -1,0 +1,194 @@
+# Default values for sample.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: spring-boot-simple-web-postgres
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+env:
+  springDatasourceUrl: "jdbc:postgresql://simple-web-postgres-postgresql:5432/sample"
+  springDatasourceUsername: ""
+  springDatasourcePassword: ""
+
+
+#  env:
+#    - name: SPRING_DATASOURCE_URL
+#      value:
+#    - name: SPRING_DATASOURCE_USERNAME
+#      value: sample
+#    - name: SPRING_DATASOURCE_PASSWORD
+#      value: sample
+#    - name: spring.activemq.in-memory
+#      value: "true"
+#    - name: easytax.oltp.activemq.embedded
+#      value: "true"
+#    - name: JAVA_OPTS
+#      value: "-Duser.timezone=Europe/Zurich"
+
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+# fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+# runAsNonRoot: true
+# runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+#   cpu: 100m
+#   memory: 128Mi
+
+## At the moment autoscaling easytax is not supported but will be in the future
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+## Configuration values for the postgresql dependency.
+## Ref: https://github.com/helm/charts/blob/master/stable/postgresql/README.md
+##
+postgresql:
+
+  image:
+    debug: true
+
+  initdbScriptsConfigMap: configmap-postgres-init-scripts
+
+  ## initdbScripts:
+  ##  setup.sql: |
+  ##   CREATE TABLE instr_event_priority_fn (instr_event_priority_id VARCHAR(140), revision_id NUMERIC(19), CONSTRAINT pk_instr_event_priority_fn PRIMARY KEY (instr_event_priority_id));
+
+  ## Use the PostgreSQL chart dependency.
+  ##
+  ## Set to false if bringing your own PostgreSQL, and set the corresponding `secrets`
+  ## fields that correspond to the PostgreSQL variables that `concourse web` should use
+  ## to connect to.
+  ##
+  ## Should be set to false if using the chart as a worker only deployment.
+  ##
+  enabled: true
+
+  ## Provide a name to substitute for the full name of postgresql resources
+  ## ps.: Resources will not be appended with "-postgresql"
+  ##
+  fullnameOverride:
+
+  ### PostgreSQL User to create.
+  ##
+  postgresqlUsername: sample
+
+  ## PostgreSQL Password for the new user.
+  ## If not set, a random 10 characters password will be used.
+  ##
+  postgresqlPassword: sample
+
+  ## PostgreSQL Database to create.
+  ##
+  postgresqlDatabase: sample
+
+  ## Allows for setting a specific cluster ip for the PostgreSQL
+  ## service.
+  service:
+    clusterIP: None
+
+  ## Persistent Volume Storage configuration for PostgreSQL.
+  ##
+  ## Ref: https://kubernetes.io/docs/user-guide/persistent-volumes
+  ##
+  persistence:
+    ## Enable PostgreSQL persistence using Persistent Volume Claims.
+    ##
+    enabled: true
+
+    ## Persistent Volume Storage Class to be used by PersistentVolumes created
+    ## for PostgreSQL.
+    ##
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass:
+
+    ## Persistent Volume Access Mode.
+    ##
+    accessModes:
+      - ReadWriteOnce
+
+    ## Persistent Volume Storage Size.
+    ##
+    size: 8Gi
+
+## For managing secrets using Helm
+##
+secrets:
+  ## Create the secret resource from the following values. Set this to
+  ## false to manage these secrets outside Helm.
+  ##
+  create: true
+
+  ## Secrets for DB access
+  ##
+  postgresUser:
+  postgresPassword:
+  postgresCaCert:
+  postgresClientCert:
+  postgresClientKey:

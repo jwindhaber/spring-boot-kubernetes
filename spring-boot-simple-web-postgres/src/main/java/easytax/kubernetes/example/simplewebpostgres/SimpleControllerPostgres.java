@@ -18,8 +18,8 @@ public class SimpleControllerPostgres {
 
     @GetMapping(path = "/hello")
     public String sayHello() {
-        simpleRepository.checkPostgres();
-        return "Hello you old fart!";
+        Integer check = simpleRepository.checkPostgres();
+        return "Hello you old database bastard!: " + check;
     }
 
 }

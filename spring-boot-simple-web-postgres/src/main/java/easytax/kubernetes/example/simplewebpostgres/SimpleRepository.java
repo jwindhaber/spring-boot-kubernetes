@@ -14,8 +14,8 @@ public class SimpleRepository {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    public void checkPostgres() {
-        jdbcTemplate.execute("SELECT 1");
+    public Integer checkPostgres() {
+        return jdbcTemplate.queryForObject("SELECT 1", Integer.class);
     }
 
 

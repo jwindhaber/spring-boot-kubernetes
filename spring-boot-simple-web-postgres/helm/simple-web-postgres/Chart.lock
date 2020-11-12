@@ -5,5 +5,8 @@ dependencies:
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
   version: 3.8.0
-digest: sha256:b59ad47836bad21961073ace8c34b64688050833dc406baf52faf2ed2aea6c17
-generated: "2020-11-09T11:17:45.2306771+01:00"
+- name: simple-web-database-init-scripts
+  repository: file://../simple-web-database-init-scripts
+  version: 0.1.0
+digest: sha256:72bdf4c2c0dccdbf88f3c4b08c5dbf941d49738ddff46534ce7af32bca7b0c4a
+generated: "2020-11-12T14:03:38.1846273+01:00"

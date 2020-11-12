@@ -56,17 +56,19 @@ service:
   port: 80
 
 ingress:
-  enabled: false
-  annotations: {}
-  # kubernetes.io/ingress.class: nginx
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    ingress.kubernetes.io/hsts: "true"
   # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: chart-example.local
-      paths: []
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+    - host: localhost
+      paths: [/]
+  tls:
+    - secretName: web-tls-secret
+      hosts:
+        - localhost
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -103,7 +105,7 @@ postgresql:
   image:
     debug: true
 
-  initdbScriptsConfigMap: configmap-postgres-init-scripts
+#  initdbScriptsConfigMap: configmap-postgres-init-scripts
 
   ## initdbScripts:
   ##  setup.sql: |
@@ -178,6 +180,60 @@ secrets:
   ## false to manage these secrets outside Helm.
   ##
   create: true
+
+  ## The TLS certificate and private key for the web component to be able to terminate TLS connections.
+  ## This is an example key for localhost which must be replaced with a valid one
+  webTlsCert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIDMTCCAhmgAwIBAgIUBuFZ9ENVH3IYkBRxdIj2OnqJSRYwDQYJKoZIhvcNAQEL
+    BQAwKDESMBAGA1UEAwwJbG9jYWxob3N0MRIwEAYDVQQKDAlsb2NhbGhvc3QwHhcN
+    MjAxMTEyMDkxMDU0WhcNMjExMTEyMDkxMDU0WjAoMRIwEAYDVQQDDAlsb2NhbGhv
+    c3QxEjAQBgNVBAoMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+    AQoCggEBAOGg+x2LoUOGfIrVKXDnMNf8fSqz1srj02D1yFR6i0A6cBf2tPPViFj0
+    kAhx1lGWjpUgyGSi/pPzxl1LLQp9cKgrAv0ZIOZCyHp+KWwK/3SYg6B7kEbnCuys
+    qwThgfDz9fB2VGx5vhzaoNjlHK0/BFjSyU8e4cOBJtg2yxkBAkKYHo1ZdzfM5y1P
+    pyNT1n6p6S/NEWqCybWAndaBsF8Gt8gUokV0jVmnARp0R5O7AXQYIvqQXpTj5fJT
+    CcUQqMcnl05PyAU0DHVpjZo1MUqCiMcG0846gv7I+3gCieUDzm0TziTuP145cUfA
+    1N1jCTe2Qnly9SDioKQJx07KGi0m6cUCAwEAAaNTMFEwHQYDVR0OBBYEFFAczncq
+    M/pnJE2/q+QYCSLBWUeYMB8GA1UdIwQYMBaAFFAczncqM/pnJE2/q+QYCSLBWUeY
+    MA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAJdDWIgQ12E3FLfm
+    ZH0UC6iSqTOHDArO1P0hSq99nXu5q1nnKyo97UN4cC4KXj5iILw1PWuddID+D/uB
+    QSlvlf5hdtpe+ZAHCNJMQoHXU7Z+nfWFcrH+l0+oDqIhAHf8CUPPqA+3HHecZF/5
+    TBEeEKQlWqRA28xE2XuUYSqq2KU0y45kmXR7TLxDMQ0+1hXOVxaK5DKgU/raHbkm
+    fwUma77ffqul3VBYBVVX2IbP3ItPScFz7dBOqq2jY0OGj24B/DF24T/9a840zzVk
+    U12J2brSxoSgaT9q04TeK21y6Dvt0NIOr/G7M/B7EZUGGjO8fpTsOAt5r4FuYVvp
+    ePVEHv8=
+    -----END CERTIFICATE-----
+
+  webTlsKey: |-
+    -----BEGIN PRIVATE KEY-----
+    MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDhoPsdi6FDhnyK
+    1Slw5zDX/H0qs9bK49Ng9chUeotAOnAX9rTz1YhY9JAIcdZRlo6VIMhkov6T88Zd
+    Sy0KfXCoKwL9GSDmQsh6filsCv90mIOge5BG5wrsrKsE4YHw8/XwdlRseb4c2qDY
+    5RytPwRY0slPHuHDgSbYNssZAQJCmB6NWXc3zOctT6cjU9Z+qekvzRFqgsm1gJ3W
+    gbBfBrfIFKJFdI1ZpwEadEeTuwF0GCL6kF6U4+XyUwnFEKjHJ5dOT8gFNAx1aY2a
+    NTFKgojHBtPOOoL+yPt4AonlA85tE84k7j9eOXFHwNTdYwk3tkJ5cvUg4qCkCcdO
+    yhotJunFAgMBAAECggEAA2Caga22Y0FfGeDo9uSvCXyhDwOUIoNYhaoILqOK9BIr
+    3V/3A3Nd0B8RDN9PWvdK+RZ9iWwbLXHHtVvLt8164zmJmOpIYMn9IEBFNHXRrxgd
+    WEihNz58HmDTSoZpoIa2VrwetWT5IItxPu3nCPzZfs7g7otCy99iCnh/f8dRFlgT
+    YZ8MySRRqquWiuqrtMuWaQiPtISqnaMEE2nHOOWEEngCrAe3x+EK7QR22XnFjlvr
+    qUzDmI6ltQdlKdNoI5xOh4mglpFNLWlN3YD4uU4nnC5SlL0V589rLDd7Zdxalw65
+    dbXPNWC3m90SpWXfgxtpXpXo4Lncz8BorkT+Fzuh3QKBgQD6A+duJwKIo6WiTOOv
+    CtaIONMu5KwTKHRm8EiUVoAXVbEvZyEdyzO6AWdFS/kW37V1BNdfhh2g2wFMJ88F
+    5tfOypKtfeewqIps82FRF4924mlbqg6XTfNq9p8ccvQtomRi/vw/MTibO8okRAdT
+    hwmqLNzm/RJtpWIh6+wpJKH9ZwKBgQDnB6L9RbzZc61bFUX6L2DDtLM7v+94GlJ8
+    uWBZLrGxacFbXyM1NPzahgeQQdqy9h7TOCfuRcXwoAjiFzxtHUJwFyOgnDQn8c1P
+    ac5WFHL2JNQSWgQWQQ89nal3AvUnVrzadsWotLiN3uajbaSKYFGoN+XJmlsmTvjz
+    wfDlwNP38wKBgQCW0TAUhLfEkWNjapqWhyUu+4h5azxaOjctuZku0pdmfCzseXvC
+    q0fC1wHjDZdvMvgVZRw+5XqOBE7eD82Us9JPTmf4/FB9gs4uNwrnjhzfDGmeABHZ
+    OA604ZzN3pJpzOJdzY+A10Jcck7YXalFu9oarAF93f/14KQ37keB8jU91QKBgBmC
+    GljkjklkIEviOWu6N3DkTrXWJ1aXcWwb+6tdIHl6N8Mi6fxB8XkfO06ONttzmUuw
+    85e3VHeQ8+oirqVNibxekax2ErwmUojmIcYXU+ohftjX34Olg01GTyO4y+CgDxH/
+    8ysBaS8g4U5CGNy+bcWpBlIQHOhJ5+riCvsTI1RJAoGACjIJNfC8oF1ZKZ+XFWJw
+    0y40fPPPNNlZbourRID6WBM2z6yH87/igwwg4/QsDPisxJnlDGSgkEaGwfyzMMy9
+    v7OGsyhdTLQ87WArV8/jSmeN3mE9UxyhahkFB5BkzINZYgWMf9evbFOuvveQl8Te
+    BoF/GvpqCc0qXM8jaa9stkU=
+    -----END PRIVATE KEY-----
 
   ## Secrets for DB access
   ##
